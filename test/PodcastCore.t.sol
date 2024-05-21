@@ -2,13 +2,13 @@
 pragma solidity 0.8.23;
 
 import { Test } from "forge-std/Test.sol";
-import { IPAssetRegistry } from "@storyprotocol/core/registries/IPAssetRegistry.sol";
-import { LicenseRegistry } from "@storyprotocol/core/registries/LicenseRegistry.sol";
-
-import { IPALicenseTerms } from "../src/IPALicenseTerms.sol";
+import { IPAssetRegistry } from "lib/protocol-core-v1/contracts/registries/IPAssetRegistry.sol";
+import { LicenseRegistry } from "lib/protocol-core-v1/contracts/registries/LicenseRegistry.sol";
+import { PILicenseTemplate } from "lib/protocol-core-v1/contracts/modules/licensing/PILicenseTemplate.sol";
+import  {PodcastCore} from "../src/PodcastCore.sol";
 import { StoryPod } from "../src/StoryPod.sol";
 
-contract IPALicenseTermsTest is Test {
+contract PodcastCoreTest is Test {
     address internal alice = address(0xa11ce);
 
     // Protocol Core v1 addresses
@@ -21,14 +21,14 @@ contract IPALicenseTermsTest is Test {
     IPAssetRegistry public ipAssetRegistry;
     LicenseRegistry public licenseRegistry;
 
-    IPALicenseTerms public ipaLicenseTerms;
+    PodcastCore public podcastcore;
     StoryPod public storyPod;
 
     function setUp() public {
         ipAssetRegistry = IPAssetRegistry(ipAssetRegistryAddr);
         licenseRegistry = LicenseRegistry(licenseRegistryAddr);
-        ipaLicenseTerms = new IPALicenseTerms(ipAssetRegistryAddr, licensingModuleAddr, pilTemplateAddr);
-        storyPod = StoryPod(ipaLicenseTerms.STORYPOD_NFT());
+        podcastcore = new PodcastCore(ipAssetRegistryAddr, licensingModuleAddr, pilTemplateAddr);
+        storyPod = StoryPod(podcastcore.STORYPOD_NFT());
 
         vm.label(address(ipAssetRegistryAddr), "IPAssetRegistry");
         vm.label(address(licensingModuleAddr), "LicensingModule");
@@ -46,7 +46,7 @@ contract IPALicenseTermsTest is Test {
         uint256 expectedLicenseTermsId = 3;
 
         vm.prank(alice);
-        (address ipId, uint256 tokenId) = ipaLicenseTerms.attachLicenseTerms();
+        (address ipId, uint256 tokenId) = podcastcore.attachLicenseTerms();
 
         assertEq(ipId, expectedIpId);
         assertEq(tokenId, expectedTokenId);
