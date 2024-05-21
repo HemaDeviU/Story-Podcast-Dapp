@@ -1,31 +1,85 @@
-// #SPDX-License-Identifer: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity 0.8.23;
-    
-import { IP } from "@story-protocol/protocol-core/contracts/lib/IP.sol";
-import { IPAssetRegistry } from "@story-protocol/protocol-core/contracts/registries/IPAssetRegistry.sol";
-import { IPResolver } from "@story-protocol/protocol-core/contracts/resolvers/IPResolver.sol";
+import { IPAssetRegistry } from "lib/protocol-core-v1/contracts/registries/IPAssetRegistry.sol";
+import { LicensingModule } from "lib/protocol-core-v1/contracts/registries/LicenseRegistry.sol";
+import { PILicenseTemplate } from "lib/protocol-core-v1/contracts/modules/licensing/PILicenseTemplate.sol";
+import { StoryPod } from "./StoryPod.sol";
 
-contract PodcastCore{
-     address public immutable NFT;
-    address public immutable IP_RESOLVER;
-    IPAssetRegistry public immutable IPA_REGISTRY;
-    
-     constructor(address ipAssetRegistry,address resolver,address nft) {
-        IPA_REGISTRY = IPAssetRegistry(ipAssetRegistry);
-        IP_RESOLVER = resolver;
-        NFT = nft;
+/// @notice Register content as an NFT with an IP Account.License,remix and enjoy shared revenue from your creation.
+contract PodcastCore {
+    IPAssetRegistry public immutable IP_ASSET_REGISTRY;
+    LicensingModule public immutable LICENSING_MODULE;
+    PILicenseTemplate public immutable PIL_TEMPLATE;
+
+    StoryPod public immutable STORYPOD_NFT;
+
+    constructor(address ipAssetRegistry,address licensingModule, address pilTemplate) {
+        IP_ASSET_REGISTRY = IPAssetRegistry(ipAssetRegistry);
+        LICENSING_MODULE = LicensingModule(licensingModule);
+        PIL_TEMPLATE = PILicenseTemplate(pilTemplate);
+        STORYPOD_NFT = new StoryPod(msg.sender);
     }
 
-    function register(string memory ipName,uint256 tokenId) external returns (address) {
-        bytes memory metadata = abi.encode(
-            IP.MetadataV1({
-                name: ipName,
-                hash: "",
-                registrationDate: uint64(block.timestamp),
-                registrant: msg.sender,
-                uri: ""
-            })
-        );
-        return IPA_REGISTRY.register(block.chainid, NFT, tokenId, IP_RESOLVER, true, metadata);
+    /// @notice Mint an IP NFT, register it as an IP Account and attach license terms via Story Protocol core.
+    /// @param URI of the episode from ipfs
+    /// @return ipId The address of the IP Account
+    /// @return tokenId The token ID of the IP NFT
+
+    function mintUniqueIp(string memory uri) external returns (address ipId, uint256 tokenId) {
+        tokenId = STORYPOD_NFT.safeMint(address(this), uri);
+        ipId = IP_ASSET_REGISTRY.register(block.chainid, address(STORYPOD_NFT), tokenId);
+        //commercial license with remix royalty, so 3
+        LICENSING_MODULE.attachLicenseTerms(ipId, address(PIL_TEMPLATE), 3);
+        STORYPOD_NFT.transferFrom(address(this), msg.sender, tokenId);
     }
-}
+    
+
+    /// @notice Mint License tokens to the recipient who wants to remix your content.
+    ///@param ipId The address of the IP Account
+    /// @param amount of license token to be minted
+    /// @param address of the recipient whom you grant the license to remix
+    /// @return ipId The address of the IP Account
+    /// @return startLicenseTokenId The allocated tokenids
+
+
+    function mintLicenseTokenForUniqueIP(address ipId ,uint256 ltAmount,address ltRecipient) 
+    external returns (address ipId, uint256 startLicenseTokenId)
+    {
+        startLicenseTokenId = LICENSING_MODULE.mintLicenseTokens({
+            licensorIpId: ipId,
+            licenseTemplate: address(PIL_TEMPLATE),
+            licenseTermsId: 2,
+            amount: ltAmount,
+            receiver: ltRecipient,
+            royaltyContext: "" 
+        });
+
+    }
+
+    ///@notice Remix IP :Register a derived episode IP NFT and mint License Tokens
+
+
+    function registerAndMintTokenForRemixIP(
+        uint256 ltAmount,
+        address ltRecipient
+    ) external returns (address ipId, uint256 tokenId, uint256 startLicenseTokenId) {
+      
+        tokenId =  STORYPOD_NFT.mint(address(this));
+        ipId = IP_ASSET_REGISTRY.register(block.chainid, address(STORYPOD_NFT), tokenId);
+
+        LICENSING_MODULE.attachLicenseTerms(ipId, address(PIL_TEMPLATE), 3);
+
+        startLicenseTokenId = LICENSING_MODULE.mintLicenseTokens({
+            licensorIpId: ipId,
+            licenseTemplate: address(PIL_TEMPLATE),
+            licenseTermsId: 2,
+            amount: ltAmount,
+            receiver: ltRecipient,
+            royaltyContext: "" 
+        });
+         STORYPOD_NFT.transferFrom(address(this), msg.sender, tokenId);
+    }
+
+
+    }
+
