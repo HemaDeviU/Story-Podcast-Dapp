@@ -3,14 +3,17 @@ pragma solidity 0.8.23;
 import { IPAssetRegistry } from "lib/protocol-core-v1/contracts/registries/IPAssetRegistry.sol";
 import { LicensingModule } from "lib/protocol-core-v1/contracts/modules/licensing/LicensingModule.sol";
 import { PILicenseTemplate } from "lib/protocol-core-v1/contracts/modules/licensing/PILicenseTemplate.sol";
+import {RoyaltyModule} from "lib/protocol-core-v1/contracts/modules/royalty/RoyaltyModule.sol";
+import {IPAccountRegistry} from "lib/protocol-core-v1/contracts/registries/IPAccountRegistry.sol";
 import { StoryPod } from "./StoryPod.sol";
 
 /// @notice Register content as an NFT with an IP Account.License,remix and enjoy shared revenue from your creation.
 contract PodcastCore {
     IPAssetRegistry public immutable IP_ASSET_REGISTRY;
+    IPAccountRegistry public immutable IP_ACCOUNT_REGISTRY;
     LicensingModule public immutable LICENSING_MODULE;
     PILicenseTemplate public immutable PIL_TEMPLATE;
-
+    RoyaltyModule public immutable ROYALTY_MODULE;
     StoryPod public immutable STORYPOD_NFT;
 
     constructor(address ipAssetRegistry,address licensingModule, address pilTemplate) {
@@ -59,10 +62,11 @@ contract PodcastCore {
 
     function registerAndMintTokenForRemixIP(
         uint256 ltAmount,
-        address ltRecipient
+        address ltRecipient,string memory uri
     ) external returns (address ipId, uint256 tokenId, uint256 startLicenseTokenId) {
+        
         address current= address(this);
-        tokenId =  STORYPOD_NFT.safeMint(current);
+        tokenId =  STORYPOD_NFT.safeMint(current,uri);
         ipId = IP_ASSET_REGISTRY.register(block.chainid, address(STORYPOD_NFT), tokenId);
 
         LICENSING_MODULE.attachLicenseTerms(ipId, address(PIL_TEMPLATE), 3);
@@ -77,6 +81,26 @@ contract PodcastCore {
         });
          STORYPOD_NFT.transferFrom(address(this), msg.sender, tokenId);
     }
+
+    function tipEpisode(address ipId) external payable {
+        require(msg.value > 0, "Please tip more than zero");
+        //find ipid owner
+        //update balance of owner
+
+
+    }
+    function withdrawEarnings(address ipId) external payable{
+        //check msg.sender == ipid owner
+        //balance greater than 0
+        // low level call
+
+      // IP_ACCOUNT_REGISTRY._get6551AccountAddress(uint256 chainId,address tokenContract,uint256 tokenId);
+      //in ip acoounnt registry
+
+    }
+
+    
+
 
 
     }

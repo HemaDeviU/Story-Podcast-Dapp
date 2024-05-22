@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.23;
+/* // SPDX-License-Identifier: UNLICENSED
+
 
 import { Test } from "forge-std/Test.sol";
 import { IPAssetRegistry } from "lib/protocol-core-v1/contracts/registries/IPAssetRegistry.sol";
@@ -39,7 +39,7 @@ contract PodcastCoreTest is Test {
     }
 
     function test_attachLicenseTerms() public {
-        uint256 expectedTokenId = storyPod.nextTokenId();
+        uint256 expectedTokenId = storyPod._nextTokenId();
         address expectedIpId = ipAssetRegistry.ipId(block.chainid, address(storyPod), expectedTokenId);
 
         address expectedLicenseTemplate = pilTemplateAddr;
