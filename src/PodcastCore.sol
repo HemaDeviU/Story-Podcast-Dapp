@@ -18,6 +18,9 @@ contract PodcastCore {
 
     mapping (address => string) internal userNames;
 
+    event remixRequest(address indexed ipOwner, uint256 requestedLtAmount, address indexed recipient, string message);
+    event remixPermissionGranted(address indexed ipOwner, uint256 ltAmount, address indexed recipient, string message);
+
     constructor(address ipAssetRegistry,address licensingModule, address pilTemplate) {
         IP_ASSET_REGISTRY = IPAssetRegistry(ipAssetRegistry);
        LICENSING_MODULE = LicensingModule(licensingModule);
@@ -39,13 +42,19 @@ contract PodcastCore {
     }
     
 
+    function requestRemixFromIPOwner(address ipId, uint256 ltAmount, string memory message) external {
+        // find ip owner
+        emit remixRequest(address(0), ltAmount, msg.sender, message);
+    }
+
     /// @notice Mint License tokens to the recipient who wants to remix your content.
     ///@param ipId The address of the IP Account
     /// @param ltAmount amount of license token to be minted
     /// @param  ltRecipient address of the recipient whom you grant the license to remix
+    /// @param message a short message to the recipient
     /// @return startLicenseTokenId
 
-    function mintLicenseTokenForUniqueIP(address ipId ,uint256 ltAmount,address ltRecipient) 
+    function mintLicenseTokenForUniqueIP(address ipId ,uint256 ltAmount,address ltRecipient, string memory message) 
     external returns (uint256 startLicenseTokenId)
     {
         startLicenseTokenId = LICENSING_MODULE.mintLicenseTokens({
@@ -56,7 +65,8 @@ contract PodcastCore {
             receiver: ltRecipient,
             royaltyContext: "" 
         });
-
+        // find ip owner
+        emit remixPermissionGranted(address(0), ltAmount, ltRecipient, message);
     }
 
     ///@notice Remix IP :Register a derived episode IP NFT and mint License Tokens
