@@ -16,6 +16,8 @@ contract PodcastCore {
     RoyaltyModule public immutable ROYALTY_MODULE;
     StoryPod public immutable STORYPOD_NFT;
 
+    mapping (address => string) internal userNames;
+
     constructor(address ipAssetRegistry,address licensingModule, address pilTemplate) {
         IP_ASSET_REGISTRY = IPAssetRegistry(ipAssetRegistry);
        LICENSING_MODULE = LicensingModule(licensingModule);
@@ -99,9 +101,15 @@ contract PodcastCore {
 
     }
 
-    
+    function registerUser(string memory _userName) external {
+        userNames[msg,sender] = _userName;
+    }
 
-
+    function getUserName() public view returns (string memory) {
+        string memory userName = userNames[msg.sender];
+        require(bytes(userName).length > 0, "Username is not set");
+        return userName;
+    }
 
     }
 
