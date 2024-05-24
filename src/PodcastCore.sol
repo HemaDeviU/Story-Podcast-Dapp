@@ -19,7 +19,7 @@ contract PodcastCore {
     mapping (address => string) internal userNames;
 
     event remixRequest(address indexed ipOwner, uint256 requestedLtAmount, address indexed recipient, string message);
-    event remixPermissionGranted(address indexed ipOwner, uint256 ltAmount, address indexed recipient, string message);
+    event remixPermissionGranted(address indexed ipId, uint256 ltAmount, address indexed recipient, string message);
 
     constructor(address ipAssetRegistry,address licensingModule, address pilTemplate) {
         IP_ASSET_REGISTRY = IPAssetRegistry(ipAssetRegistry);
@@ -65,8 +65,7 @@ contract PodcastCore {
             receiver: ltRecipient,
             royaltyContext: "" 
         });
-        // find ip owner
-        emit remixPermissionGranted(address(0), ltAmount, ltRecipient, message);
+        emit remixPermissionGranted(ipId, ltAmount, ltRecipient, message);
     }
 
     ///@notice Remix IP :Register a derived episode IP NFT and mint License Tokens
