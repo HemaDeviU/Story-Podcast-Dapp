@@ -90,6 +90,7 @@ contract PodcastCore {
             licensorIpId: ipId,
             licenseTemplate: address(PIL_TEMPLATE),
             licenseTermsId: 3,
+            licenseTermsId: 3,
             amount: ltAmount,
             receiver: ltRecipient,
             royaltyContext: "" 
@@ -114,6 +115,7 @@ contract PodcastCore {
         startLicenseTokenId = LICENSING_MODULE.mintLicenseTokens({
             licensorIpId: ipId,
             licenseTemplate: address(PIL_TEMPLATE),
+            licenseTermsId: 3,
             licenseTermsId: 3,
             amount: ltAmount,
             receiver: ltRecipient,
