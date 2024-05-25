@@ -16,10 +16,16 @@ contract PodcastCore {
     RoyaltyModule public immutable ROYALTY_MODULE;
     StoryPod public immutable STORYPOD_NFT;
 
+     struct IpDetails {
+        uint256 tokenId;
+        address ipId;
+    }
+
     mapping (address => string) internal userNames;
+    mapping (address => IpDetails[]) internal ipDetails;
 
-
-
+    event remixRequest(address indexed ipOwner, uint256 requestedLtAmount, address indexed recipient, string message);
+    event remixPermissionGranted(address indexed ipId, uint256 ltAmount, address indexed recipient, string message);
 
     constructor(address ipAssetRegistry,address licensingModule, address pilTemplate) {
         IP_ASSET_REGISTRY = IPAssetRegistry(ipAssetRegistry);
@@ -39,6 +45,15 @@ contract PodcastCore {
         //commercial license with remix royalty, so 3
         LICENSING_MODULE.attachLicenseTerms(ipId, address(PIL_TEMPLATE), 3);
         STORYPOD_NFT.transferFrom(address(this), msg.sender, tokenId);
+        ipDetails[msg.sender].push((
+            tokenId,
+            ipId
+        ));
+    }
+
+    function requestRemixFromIPOwner(address ipId, uint256 ltAmount, string memory message) external {
+        // find ip owner
+        emit remixRequest(address(0), ltAmount, msg.sender, message);
     }
     
 
@@ -54,7 +69,7 @@ contract PodcastCore {
         startLicenseTokenId = LICENSING_MODULE.mintLicenseTokens({
             licensorIpId: ipId,
             licenseTemplate: address(PIL_TEMPLATE),
-            licenseTermsId: 2,
+            licenseTermsId: 3,
             amount: ltAmount,
             receiver: ltRecipient,
             royaltyContext: "" 
@@ -79,12 +94,16 @@ contract PodcastCore {
         startLicenseTokenId = LICENSING_MODULE.mintLicenseTokens({
             licensorIpId: ipId,
             licenseTemplate: address(PIL_TEMPLATE),
-            licenseTermsId: 2,
+            licenseTermsId: 3,
             amount: ltAmount,
             receiver: ltRecipient,
             royaltyContext: "" 
         });
          STORYPOD_NFT.transferFrom(address(this), msg.sender, tokenId);
+         ipDetails[msg.sender].push((
+            tokenId,
+            ipId
+        ));
     }
 
     function tipEpisode(address ipId) external payable {
@@ -104,7 +123,7 @@ contract PodcastCore {
 
     }
  function registerUser(string memory _userName) external {
-        userNames[msg,sender] = _userName;
+        userNames[msg.sender] = _userName;
     }
 
     function getUserName() public view returns (string memory) {
@@ -113,7 +132,15 @@ contract PodcastCore {
         return userName;
     }
 
-    
+     function getUserName() public view returns (string memory) {
+        string memory userName = userNames[msg.sender];
+        require(bytes(userName).length > 0, "Username is not set");
+        return userName;
+    }
+
+    function getIpDetails() public view returns (IpDetails[]) {
+        return ipDetails[msg.sender];
+    }
 
 
 
