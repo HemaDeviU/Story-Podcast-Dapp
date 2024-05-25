@@ -5,6 +5,8 @@ import { LicensingModule } from "lib/protocol-core-v1/contracts/modules/licensin
 import { PILicenseTemplate } from "lib/protocol-core-v1/contracts/modules/licensing/PILicenseTemplate.sol";
 import {RoyaltyModule} from "lib/protocol-core-v1/contracts/modules/royalty/RoyaltyModule.sol";
 import {IPAccountRegistry} from "lib/protocol-core-v1/contracts/registries/IPAccountRegistry.sol";
+import {IIPAccount} from "lib/protocol-core-v1/contracts/interfaces/IIPAccount.sol";
+import {RoyaltyPolicyLAP} from "";
 import { StoryPod } from "./StoryPod.sol";
 
 /// @notice Register content as an NFT with an IP Account.License,remix and enjoy shared revenue from your creation.
@@ -15,6 +17,7 @@ contract PodcastCore {
     PILicenseTemplate public immutable PIL_TEMPLATE;
     RoyaltyModule public immutable ROYALTY_MODULE;
     StoryPod public immutable STORYPOD_NFT;
+    
 
    struct IpDetails {
         uint256 tokenId;
@@ -70,7 +73,7 @@ contract PodcastCore {
         startLicenseTokenId = LICENSING_MODULE.mintLicenseTokens({
             licensorIpId: ipId,
             licenseTemplate: address(PIL_TEMPLATE),
-            licenseTermsId: 2,
+            licenseTermsId: 3,
             amount: ltAmount,
             receiver: ltRecipient,
             royaltyContext: "" 
@@ -95,7 +98,7 @@ contract PodcastCore {
         startLicenseTokenId = LICENSING_MODULE.mintLicenseTokens({
             licensorIpId: ipId,
             licenseTemplate: address(PIL_TEMPLATE),
-            licenseTermsId: 2,
+            licenseTermsId: 3,
             amount: ltAmount,
             receiver: ltRecipient,
             royaltyContext: "" 
@@ -107,25 +110,40 @@ contract PodcastCore {
         ));
     }
 
+
+
+    //---Royalty----//
+
     function tipEpisode(address ipId) external payable {
         require(msg.value > 0, "Please tip more than zero");
-        //find ipid owner
-        //update balance of owner
+
+        ROYALTY_MODULE.payRoyaltyOnBehalf(
+         ipId,
+         payerIpId,//ask jacob what to do when a user tips, why ipid for user
+         token,
+         amount);
 
 
     }
-    function withdrawEarnings(address ipId) external payable{
+
+    function collectFirstRoyalty(address ipId)
+    {
+       address ipVaultAddress =  ROYALTYPOLICYLAP.getRoyaltyData(
+        address ipId);
+        IPROYALTYVAULT.collectRoyaltyTokens(address ipId);
+    
+    }
+
+
+    function withdrawEarnings(address ipId, address tokenaddress) external payable{
         //check msg.sender == ipid owner
         //balance greater than 0
-        // low level call
-
-      // IP_ACCOUNT_REGISTRY._get6551AccountAddress(uint256 chainId,address tokenContract,uint256 tokenId);
-      //in ip acoounnt registry
-
+       uint256 snapshotid = IPROYALTYVAULT.snapshot();
+       claimRevenueBySnapshotBatch(snapshotid,tokenaddress);
     }
 
     function registerUser(string memory _userName) external {
-        userNames[msg,sender] = _userName;
+        userNames[msg.sender] = _userName;
     }
 
     function getUserName() public view returns (string memory) {
@@ -135,6 +153,9 @@ contract PodcastCore {
     }
     function getIpDetails() public view returns (IpDetails[]) {
         return ipDetails[msg.sender];
+    }
+   function owner(tokenId) public view returns (address) {
+        IPACCOUNTIMPL.owner();//no param in protocol file, check again
     }
 
     }
