@@ -16,7 +16,13 @@ contract PodcastCore {
     RoyaltyModule public immutable ROYALTY_MODULE;
     StoryPod public immutable STORYPOD_NFT;
 
+   struct IpDetails {
+        uint256 tokenId;
+        address ipId;
+    }
+
     mapping (address => string) internal userNames;
+    mapping (address => IpDetails[]) internal ipDetails;
 
     event remixRequest(address indexed ipOwner, uint256 requestedLtAmount, address indexed recipient, string message);
     event remixPermissionGranted(address indexed ipId, uint256 ltAmount, address indexed recipient, string message);
@@ -39,6 +45,10 @@ contract PodcastCore {
         //commercial license with remix royalty, so 3
         LICENSING_MODULE.attachLicenseTerms(ipId, address(PIL_TEMPLATE), 3);
         STORYPOD_NFT.transferFrom(address(this), msg.sender, tokenId);
+         ipDetails[msg.sender].push((
+            tokenId,
+            ipId
+        ));
     }
     
 
@@ -91,6 +101,10 @@ contract PodcastCore {
             royaltyContext: "" 
         });
          STORYPOD_NFT.transferFrom(address(this), msg.sender, tokenId);
+         ipDetails[msg.sender].push((
+            tokenId,
+            ipId
+        ));
     }
 
     function tipEpisode(address ipId) external payable {
@@ -118,6 +132,9 @@ contract PodcastCore {
         string memory userName = userNames[msg.sender];
         require(bytes(userName).length > 0, "Username is not set");
         return userName;
+    }
+    function getIpDetails() public view returns (IpDetails[]) {
+        return ipDetails[msg.sender];
     }
 
     }
