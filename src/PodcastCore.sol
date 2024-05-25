@@ -6,8 +6,16 @@ import { PILicenseTemplate } from "lib/protocol-core-v1/contracts/modules/licens
 import {RoyaltyModule} from "lib/protocol-core-v1/contracts/modules/royalty/RoyaltyModule.sol";
 import {IPAccountRegistry} from "lib/protocol-core-v1/contracts/registries/IPAccountRegistry.sol";
 import {IIPAccount} from "lib/protocol-core-v1/contracts/interfaces/IIPAccount.sol";
-import {RoyaltyPolicyLAP} from "";
+import {RoyaltyPolicyLAP} from "lib/protocol-core-v1/contracts/modules/royalty/policies/RoyaltyPolicyLAP.sol";
+import {IpRoyaltyVault} from "lib/protocol-core-v1/contracts/modules/royalty/policies/IpRoyaltyVault.sol";
 import { StoryPod } from "./StoryPod.sol";
+
+
+interface IERC20 {
+    function mint(address to, uint256 amount) external returns (bool);
+    function transfer(address recipient, uint256 amount) external returns (bool);
+    function balanceOf(address account) external view returns (uint256);
+}
 
 /// @notice Register content as an NFT with an IP Account.License,remix and enjoy shared revenue from your creation.
 contract PodcastCore {
@@ -16,7 +24,11 @@ contract PodcastCore {
     LicensingModule public immutable LICENSING_MODULE;
     PILicenseTemplate public immutable PIL_TEMPLATE;
     RoyaltyModule public immutable ROYALTY_MODULE;
+    RoyaltyPolicyLAP public immutable ROYALTYPOLICYLAP;
+    IpRoyaltyVault public immutable IPROYALTYVAULT;
+     IERC20 public immutable TIP_TOKEN;
     StoryPod public immutable STORYPOD_NFT;
+    address immutable tiptoken = 0xB132A6B7AE652c974EE1557A3521D53d18F6739f;
     
 
    struct IpDetails {
@@ -30,10 +42,14 @@ contract PodcastCore {
     event remixRequest(address indexed ipOwner, uint256 requestedLtAmount, address indexed recipient, string message);
     event remixPermissionGranted(address indexed ipId, uint256 ltAmount, address indexed recipient, string message);
 
-    constructor(address ipAssetRegistry,address licensingModule, address pilTemplate) {
+    constructor(address ipAssetRegistry,address licensingModule, address pilTemplate, address royaltymodule, address iproyaltyvault, address tiptoken) {
         IP_ASSET_REGISTRY = IPAssetRegistry(ipAssetRegistry);
        LICENSING_MODULE = LicensingModule(licensingModule);
+       ROYALTY_MODULE = RoyaltyModule(royaltymodule);
         PIL_TEMPLATE = PILicenseTemplate(pilTemplate);
+        IPROYALTYVAULT = IpRoyaltyVault(iproyaltyvault);
+      ROYALTYPOLICYLAP = RoyaltyPolicyLAP(royaltypolicylap);
+       TIP_TOKEN = IERC20(tipToken);
         STORYPOD_NFT = new StoryPod(msg.sender);
     }
 
@@ -89,7 +105,7 @@ contract PodcastCore {
         address ltRecipient,string memory uri
     ) external returns (address ipId, uint256 tokenId, uint256 startLicenseTokenId) {
         
-        address current= address(this);
+        address current = address(this);
         tokenId =  STORYPOD_NFT.safeMint(current,uri);
         ipId = IP_ASSET_REGISTRY.register(block.chainid, address(STORYPOD_NFT), tokenId);
 
@@ -113,33 +129,31 @@ contract PodcastCore {
 
 
     //---Royalty----//
-
-    function tipEpisode(address ipId) external payable {
-        require(msg.value > 0, "Please tip more than zero");
-
-        ROYALTY_MODULE.payRoyaltyOnBehalf(
-         ipId,
-         payerIpId,//ask jacob what to do when a user tips, why ipid for user
-         token,
-         amount);
-
-
+  
+     function mintTipToken(address to, uint256 amount) external {
+        require(TIP_TOKEN.mint(to, amount), "Minting failed");
     }
 
-    function collectFirstRoyalty(address ipId)
+    function tipEpisode(address ipId, uint256 amount) external payable {
+        require(amount > 0, "Please tip more than zero");
+        require(TIP_TOKEN.transferFrom(msg.sender, address(this), amount), "Token transfer failed");
+        require(TIP_TOKEN.approve(address(ROYALTY_MODULE), amount), "Token approval failed");
+        ROYALTY_MODULE.payRoyaltyOnBehalf(ipId,
+         address(0),//user doesn't have ipid
+         tiptoken,
+         amount);
+    }
+
+    function collectFirstRoyalty(address ipId) external payable
     {
-       address ipVaultAddress =  ROYALTYPOLICYLAP.getRoyaltyData(
-        address ipId);
-        IPROYALTYVAULT.collectRoyaltyTokens(address ipId);
-    
+       address ipVaultAddress = ROYALTYPOLICYLAP.getRoyaltyData(ipId);
+        IPROYALTYVAULT.collectRoyaltyTokens(ipId);
     }
 
 
     function withdrawEarnings(address ipId, address tokenaddress) external payable{
-        //check msg.sender == ipid owner
-        //balance greater than 0
        uint256 snapshotid = IPROYALTYVAULT.snapshot();
-       claimRevenueBySnapshotBatch(snapshotid,tokenaddress);
+       IPROYALTYVAULT.claimRevenueBySnapshotBatch(snapshotid,tokenaddress);
     }
 
     function registerUser(string memory _userName) external {
@@ -154,8 +168,9 @@ contract PodcastCore {
     function getIpDetails() public view returns (IpDetails[]) {
         return ipDetails[msg.sender];
     }
-   function owner(tokenId) public view returns (address) {
-        IPACCOUNTIMPL.owner();//no param in protocol file, check again
+   
+    function owner(uint256 tokenId) public view returns (address) {
+        return STORYPOD_NFT.ownerOf(tokenId);
     }
 
     }

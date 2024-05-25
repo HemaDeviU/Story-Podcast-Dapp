@@ -11,9 +11,7 @@ contract StoryPod is ERC721, ERC721URIStorage, Ownable {
     uint256 private _nextTokenId;
 
     constructor(address initialOwner) ERC721("R1NFT" , "R1") Ownable(initialOwner)
-    {
-
-    }
+    {}
 
     function safeMint(address to, string memory uri) public onlyOwner returns (uint256){
         uint256 tokenId = _nextTokenId++;
