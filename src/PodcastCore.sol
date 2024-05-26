@@ -62,12 +62,21 @@ contract PodcastCore is IERC721Receiver {
     /// @return ipId The address of the IP Account
     /// @return tokenId The token ID of the IP NFT
 
-    function attachLicenseTerms(string memory uri) external returns (address ipId, uint256 tokenId) {
+    function mintUniqueIp(string memory uri, uint256 ltAmount,address ltRecipient) external returns (address ipId, uint256 tokenId, uint256 startLicenseTokenId) {
         tokenId = STORYPOD_NFT.safeMint(address(this), uri);
         ipId = IP_ASSET_REGISTRY.register(block.chainid, address(STORYPOD_NFT), tokenId);
         //commercial license with remix royalty, so 3
         LICENSING_MODULE.attachLicenseTerms(ipId, address(PIL_TEMPLATE), 3);
         STORYPOD_NFT.transferFrom(address(this), msg.sender, tokenId);
+         startLicenseTokenId = LICENSING_MODULE.mintLicenseTokens({
+            licensorIpId: ipId,
+            licenseTemplate: address(PIL_TEMPLATE),
+            licenseTermsId: 3,
+            amount: ltAmount,
+            receiver: ltRecipient,
+            royaltyContext: "" 
+        });
+        emit remixPermissionGranted(ipId, ltAmount, ltRecipient, message);
         ipDetails.push(IpDetails(
             tokenId,
             ipId
@@ -78,30 +87,10 @@ contract PodcastCore is IERC721Receiver {
         );
     }
     
+    
 
     function requestRemixFromIPOwner(address ipId, uint256 ltAmount, string memory message) external {
         emit remixRequest(owner(ipIdDetails[ipId].tokenId), ltAmount, msg.sender, message);
-    }
-
-    /// @notice Mint License tokens to the recipient who wants to remix your content.
-    ///@param ipId The address of the IP Account
-    /// @param ltAmount amount of license token to be minted
-    /// @param  ltRecipient address of the recipient whom you grant the license to remix
-    /// @param message a short message to the recipient
-    /// @return startLicenseTokenId
-
-    function mintLicenseTokenForUniqueIP(address ipId ,uint256 ltAmount,address ltRecipient, string memory message) 
-    external returns (uint256 startLicenseTokenId)
-    {
-        startLicenseTokenId = LICENSING_MODULE.mintLicenseTokens({
-            licensorIpId: ipId,
-            licenseTemplate: address(PIL_TEMPLATE),
-            licenseTermsId: 3,
-            amount: ltAmount,
-            receiver: ltRecipient,
-            royaltyContext: "" 
-        });
-        emit remixPermissionGranted(ipId, ltAmount, ltRecipient, message);
     }
 
     ///@notice Remix IP :Register a derived episode IP NFT and mint License Tokens
