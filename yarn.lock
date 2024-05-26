@@ -2,41 +2,20 @@
 # yarn lockfile v1
 
 
+"@openzeppelin/contracts-upgradeable-v4@npm:@openzeppelin/contracts-upgradeable@4.9.6":
+  version "4.9.6"
+  resolved "https://registry.npmjs.org/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.9.6.tgz"
+  integrity sha512-m4iHazOsOCv1DgM7eD7GupTJ+NFVujRZt1wzddDPSVGpWdKq1SKkla5htKG7+IS4d2XOCtzkUNwRZ7Vq5aEUMA==
+
 "@openzeppelin/contracts-upgradeable@^5.0.2":
   version "5.0.2"
   resolved "https://registry.npmjs.org/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-5.0.2.tgz"
   integrity sha512-0MmkHSHiW2NRFiT9/r5Lu4eJq5UJ4/tzlOgYXNAIj/ONkQTVnz22pLxDvp4C4uZ9he7ZFvGn3Driptn1/iU7tQ==
 
-"@openzeppelin/contracts-upgradeable@5.0.1":
-  version "5.0.1"
-  resolved "https://registry.npmjs.org/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-5.0.1.tgz"
-  integrity sha512-MvaLoPnVcoZr/qqZP+4cl9piuR4gg0iIGgxVSZ/AL1iId3M6IdEHzz9Naw5Lirl4KKBI6ciTVnX07yL4dOMIJg==
-
 "@openzeppelin/contracts@^5.0.2", "@openzeppelin/contracts@5.0.2":
   version "5.0.2"
   resolved "https://registry.npmjs.org/@openzeppelin/contracts/-/contracts-5.0.2.tgz"
   integrity sha512-ytPc6eLGcHHnapAZ9S+5qsdomhjo6QBHTDRRBFfTxXIpsicMhVPouPgmUPebZZZGX7vt9USA+Z+0M0dSVtSUEA==
-
-"@openzeppelin/contracts@5.0.1":
-  version "5.0.1"
-  resolved "https://registry.npmjs.org/@openzeppelin/contracts/-/contracts-5.0.1.tgz"
-  integrity sha512-yQJaT5HDp9hYOOp4jTYxMsR02gdFZFXhewX5HW9Jo4fsqSVqqyIO/xTHdWDaKX5a3pv1txmf076Lziz+sO7L1w==
-
-"@story-protocol/protocol-core@^1.0.0-beta-rc6", "@story-protocol/protocol-core@1.0.0-beta-rc6":
-  version "v1.0.0-beta-rc6"
-  dependencies:
-    "@openzeppelin/contracts" "5.0.1"
-    "@openzeppelin/contracts-upgradeable" "5.0.1"
-    erc6551 "^0.3.1"
-
-"@story-protocol/protocol-periphery@^1.0.0-beta-rc3":
-  version "1.0.0-beta-rc3"
-  resolved "https://registry.npmjs.org/@story-protocol/protocol-periphery/-/protocol-periphery-1.0.0-beta-rc3.tgz"
-  integrity sha512-YZpOK8w+5i1k1EXrkC+nxcQ01YbWAQJytslDVsqoDp6Xc6clLC//L/5esKhC8DTRo8JjW4r+nFWyWFGJyhdxVg==
-  dependencies:
-    "@openzeppelin/contracts" "5.0.1"
-    "@openzeppelin/contracts-upgradeable" "5.0.1"
-    "@story-protocol/protocol-core" "1.0.0-beta-rc6"
 
 "ds-test@https://github.com/dapphub/ds-test":
   version "1.0.0"
