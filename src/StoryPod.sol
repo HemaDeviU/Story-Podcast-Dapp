@@ -8,13 +8,13 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 // @notice mint nft of your episodes here before registering IP
 
 contract StoryPod is ERC721, ERC721URIStorage, Ownable {
-    uint256 private _nextTokenId;
+    uint256 public nextTokenId = 1;
 
     constructor(address initialOwner) ERC721("R1NFT" , "R1") Ownable(initialOwner)
     {}
 
     function safeMint(address to, string memory uri) public onlyOwner returns (uint256){
-        uint256 tokenId = _nextTokenId++;
+        uint256 tokenId = nextTokenId++;
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
         return tokenId;
@@ -37,4 +37,10 @@ contract StoryPod is ERC721, ERC721URIStorage, Ownable {
     {
         return super.supportsInterface(interfaceId);
     }
+  
+
+   
+   
+
 }
+

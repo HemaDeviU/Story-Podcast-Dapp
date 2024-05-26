@@ -62,7 +62,7 @@ contract PodcastCore is IERC721Receiver {
     /// @return ipId The address of the IP Account
     /// @return tokenId The token ID of the IP NFT
 
-    function mintUniqueIp(string memory uri) external returns (address ipId, uint256 tokenId) {
+    function attachLicenseTerms(string memory uri) external returns (address ipId, uint256 tokenId) {
         tokenId = STORYPOD_NFT.safeMint(address(this), uri);
         ipId = IP_ASSET_REGISTRY.register(block.chainid, address(STORYPOD_NFT), tokenId);
         //commercial license with remix royalty, so 3
