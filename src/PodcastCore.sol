@@ -31,7 +31,7 @@ contract PodcastCore is IERC721Receiver {
     IpRoyaltyVault public immutable IPROYALTYVAULT;
      IERC20 public immutable TIP_TOKEN;
     StoryPod public immutable STORYPOD_NFT;
-    address immutable tipToken = 0xB132A6B7AE652c974EE1557A3521D53d18F6739f;
+    address immutable tiptoken = 0xB132A6B7AE652c974EE1557A3521D53d18F6739f;
     
 
    struct IpDetails {
@@ -40,12 +40,13 @@ contract PodcastCore is IERC721Receiver {
     }
 
     mapping (address => string) internal userNames;
+    mapping (address => IpDetails) internal ipIdDetails;
     IpDetails[] internal ipDetails;
 
-   event remixRequest(address indexed ipOwner, uint256 requestedLtAmount, address indexed recipient, string message);
+    event remixRequest(address indexed ipOwner, uint256 requestedLtAmount, address indexed recipient, string message);
     event remixPermissionGranted(address indexed ipId, uint256 ltAmount, address indexed recipient, string message);
 
-    constructor(address ipAssetRegistry,address licensingModule, address pilTemplate, address royaltymodule, address iproyaltyvault, address royaltypolicylap, address tiptoken) {
+    constructor(address ipAssetRegistry,address licensingModule, address pilTemplate, address royaltymodule, address iproyaltyvault, address royaltypolicylap) {
         IP_ASSET_REGISTRY = IPAssetRegistry(ipAssetRegistry);
        LICENSING_MODULE = LicensingModule(licensingModule);
        ROYALTY_MODULE = RoyaltyModule(royaltymodule);
@@ -71,11 +72,15 @@ contract PodcastCore is IERC721Receiver {
             tokenId,
             ipId
         ));
-       
+        ipIdDetails[ipId] = IpDetails(
+            tokenId,
+            ipId
+        );
     }
     
-   function requestRemixFromIPOwner(address ipId, uint256 ltAmount, string memory message) external {
-        emit remixRequest((ipDetails[ipId]), ltAmount, msg.sender, message);
+
+    function requestRemixFromIPOwner(address ipId, uint256 ltAmount, string memory message) external {
+        emit remixRequest(owner(ipIdDetails[ipId].tokenId), ltAmount, msg.sender, message);
     }
 
     /// @notice Mint License tokens to the recipient who wants to remix your content.
@@ -126,7 +131,10 @@ contract PodcastCore is IERC721Receiver {
             tokenId,
             ipId
         ));
-       
+        ipIdDetails[ipId] = IpDetails(
+            tokenId,
+            ipId
+        );
     }
 
 
@@ -144,7 +152,7 @@ contract PodcastCore is IERC721Receiver {
         require(TIP_TOKEN.approve(address(ROYALTY_MODULE), amount), "Token approval failed");
         ROYALTY_MODULE.payRoyaltyOnBehalf(ipId,
          address(0),//user doesn't have ipid
-         tipToken,
+         tiptoken,
          amount);
     }
 
