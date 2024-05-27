@@ -51,7 +51,7 @@ contract PodcastCoreTest is Test {
 
         vm.prank(alice);
         string memory uri = "abc";
-        (address ipId, uint256 tokenId) = podcastcore.attachLicenseTerms(uri);
+        (address ipId, uint256 tokenId) = podcastcore.registerandLicenseforUniqueIP(uri,123,msg.sender);
 
         assertEq(ipId, expectedIpId);
         assertEq(tokenId, expectedTokenId);
