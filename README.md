@@ -1,30 +1,48 @@
-# Story-Podcast-Dapp
+# Story-Pods
+![photo_2024-05-29_00-06-28](https://github.com/HemaDeviU/Story-Podcast-Dapp/assets/144579614/83563036-1c41-4c6b-b9cd-bcf3ab169892)
+
+
 
 ## 📣 **Project Overview:**
 
-The Story Podcast project is an integrated platform designed to effectively manage, license, protect, and monetize audio content. Its key features include registration and management, licensing system, content search and identification, attribution, platform transactions, and tipping functionality. This project aims to support creators in managing and monetizing their content while fostering content protection and collaboration through an efficient and integrated solution.
+**[Demo](https://frontend-delta-lovat.vercel.app/)** | 
+Own your podcasts! Attest your episodes with Story Protocol and enjoy royalty from your creation. Let your users support your content,
 <br></br>
 
 ## 🎧 **Project Objective:**
 
-The goal of this project is to develop an integrated platform for effectively managing, licensing, protecting, and monetizing podcasts and other audio content for creators.
+An integrated podcast platform for creators and podcast listeners. Creators can use the StoryPods dapp to register their episodes as an IP and license it. Another creator can easily remix this episode and create a derivate of it. Users can tip an episode they love and this revenue is shared among the creators according to the royalty terms.
 <br></br>
 
-## 🎶 **Key Features:**
+## 🛠️ Key Features:
+### Attribution for Creator:
 
-1. **Registration and Management:**
-   - Creators can register their audio content onto Story Protocol's IP layer, making it easier to manage and protect original works. This ensures clear attribution and facilitates licensing and usage rights management.
-2. **Licensing System:**
-   - The licensing system will be integrated with Story Protocol's licensing module. Creators can set transparent licensing terms via Story Protocol, allowing for secure content sharing and revenue generation.
-3. **Content Search and Identification:**
-   - Enhance content search and identification by leveraging Story Protocol's search module. Utilize tags, keywords, and metadata to identify original content and prevent copyright infringement.
-4. **Attribution:**
-   - Utilize Story Protocol to specify the original creators of audio assets and manage licensing and usage rights. This ensures clear attribution of content and protects creator rights.
-5. **Tipping Feature:**
-   - Implement the tipping feature using Story Protocol's transaction capabilities. Users can send tokens to podcast creators to support and reward them.
-6. **User Experience Enhancement:**
-   - Develop a user-friendly interface utilizing Story Protocol's transaction processing and data storage capabilities to enhance the user experience.
+> Built an attribution layer with story protocol to original creators of audio assets and manage licensing and usage rights.
+  
+ • **Registration and Management:** Provide creators with the ability to register and manage their audio content.
+ 
+ • **Licensing System:**  Established a licensing system for audio content to enable copyright protection and commercial use.
+ 
+ • **Remix System:**  Provided an ethical framework for creators to use original content to create a remix of it, with standard rules and license set by the original creator - Commercial Remix License.
+ 
+ • **Royalty System:**  Enable a royalty for remixed audio content for earning from deviates of an original IP.
+<br></br>
+### User Experience Enhancement for Listener:
 
+> Offers a user-friendly interface for both creators and listeners.
+
+ • A user can stream podcasts and listen to them seamlessly.
+
+ • A user can support a creator with mini-tips specific to each episode.
+ 
+ • A user can choose to support a podcast with erc20 tokens which is directly shared with the creators.
+<br></br>
+## ✨ Future Strategies:
+
+1. Initially market to  podcast creators and small content producers, later scaling to larger entities such as music labels.
+2. Implement search functionality and licensing system while improving user experience.
+3. Revenue : Implement a revenue model for the protocol with minimal fee for handling disputes after registering.
+4. Decentralization: Implement a DAO to handle highly sensitive disputes.
 ---
 
 ## 🎸 **Flowchart:**
@@ -82,12 +100,3 @@ flowchart TD
   - Enable creators to manage ownership of their content effectively through Story Protocol. This strengthens creator rights and ensures clear ownership.
 - **Revenue Model Selection:**
   - Utilize Story Protocol to offer creators options for selecting revenue models, such as free or subscription-based models. This empowers creators to choose the revenue model that best fits their needs.
-
----
-
-## 🔊 **Future Strategies:**
-
-1. Initially target podcast creators and small content producers, with future plans to expand to larger entities such as music labels.
-2. Technically enhance search functionality and the licensing system, continuously improving user experience to enhance service quality.
-
-This detailed project aims to support creators and users in effectively managing content and generating revenue, while promoting content protection and collaboration.
